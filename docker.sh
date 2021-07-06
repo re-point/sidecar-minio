@@ -1,0 +1,1 @@
+docker build -t docker.repoint.io/sidecar/minio:5 -f docker/Dockerfile . && docker push docker.repoint.io/sidecar/minio:5
