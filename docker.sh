@@ -1,1 +1,1 @@
-docker build -t repoint.azurecr.io/sidecar/minio:develop-4 -f docker/Dockerfile . && docker push repoint.azurecr.io/sidecar/minio:develop-4
+docker build -t repoint.azurecr.io/sidecar/minio:master-1 -f docker/Dockerfile . && docker push repoint.azurecr.io/sidecar/minio:master-1
