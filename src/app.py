@@ -1,7 +1,7 @@
 import os
 import uvicorn
 
-port = os.getenv('PORT')
+port = int(os.getenv('PORT'))
 
 
 if __name__ == "__main__":

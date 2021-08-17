@@ -1,8 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 
 import os
 from minio import Minio
 import distutils.util
+import json
+from fastapi.encoders import jsonable_encoder
 
 minio_url = os.getenv('MINIO_URL')
 bucket = os.getenv('BUCKET')
@@ -16,6 +19,13 @@ minio_client = Minio(minio_url, minio_access_key, minio_secret_key, secure=minio
 app = FastAPI()
 
 
+@app.options("/", response_model=str)
+def get_metadata(from_path: str):
+    data = minio_client.stat_object(bucket, from_path)
+    jdata = jsonable_encoder(data)
+    return JSONResponse(content=jdata)
+
+
 @app.get("/", response_model=str)
 def get_file(from_path: str, to_path: str):
     minio_client.fget_object(bucket, from_path, os.path.join(temp_folder_path, to_path))
@@ -23,8 +33,14 @@ def get_file(from_path: str, to_path: str):
 
 
 @app.put("/", response_model=str)
-def create_file(from_path: str, to_path: str):
-    minio_client.fput_object(bucket, to_path, os.path.join(temp_folder_path, from_path))
+async def create_file(from_path: str, to_path: str, request: Request):
+    metadata = None
+
+    body = await request.body()
+    if body != b'':
+        metadata =  json.loads(body)
+        
+    minio_client.fput_object(bucket, to_path, os.path.join(temp_folder_path, from_path), metadata=metadata)
     return None
 
 
